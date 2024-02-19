@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import LiveCursors from './cursor/LiveCursors';
 import { useMyPresence, useOthers } from '@/liveblocks.config';
 import { CursorMode, CursorState } from '@/types/type';
+import CursorChat from './cursor/CursorChat';
 
 function Live() {
   const others = useOthers();
@@ -44,24 +45,24 @@ function Live() {
     event.preventDefault();
 
     // if cursor is not in reaction selector mode, update the cursor position
-    if (cursor == null || cursorState.mode !== CursorMode.ReactionSelector) {
-      // get the cursor position in the canvas
-      const x = event.clientX - event.currentTarget.getBoundingClientRect().x;
-      const y = event.clientY - event.currentTarget.getBoundingClientRect().y;
+    // if (cursor == null || cursorState.mode !== CursorMode.ReactionSelector) {
+    // get the cursor position in the canvas
+    const x = event.clientX - event.currentTarget.getBoundingClientRect().x;
+    const y = event.clientY - event.currentTarget.getBoundingClientRect().y;
 
-      // broadcast the cursor position to other users
-      updateMyPresence({
-        cursor: {
-          x,
-          y,
-        },
-      });
-    }
+    // broadcast the cursor position to other users
+    updateMyPresence({
+      cursor: {
+        x,
+        y,
+      },
+    });
   }, []);
 
   const handlePointerLeave = useCallback(
     (event: React.PointerEvent) => {
-      event.preventDefault();
+      // event.preventDefault();
+      setCursorState({ mode: CursorMode.Hidden });
 
       updateMyPresence({
         cursor: null,
@@ -91,6 +92,14 @@ function Live() {
       className="h-[100vh] w-full flex justify-center items-center text-center"
     >
       <h1 className="text-2xl text-white">Sickk</h1>;
+      {cursor && (
+        <CursorChat
+          cursor={cursor}
+          cursorState={cursorState}
+          setCursorState={setCursorState}
+          updateMyPresence={updateMyPresence}
+        />
+      )}
       <LiveCursors others={others} />
     </div>
   );
